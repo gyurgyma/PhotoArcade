@@ -1,19 +1,10 @@
 #:kivy 1.10.0
 
 <PhotoArcadeMenu>:
+    size: 50,50
+
     canvas:
         Rectangle:
-            pos: self.center_x - 5, 0
-            size: 10, self.height
-
-    Label:
-        font_size: 70
-        center_x: root.width / 4
-        top: root.top - 50
-        text: "0"
-
-    Label:
-        font_size: 70
-        center_x: root.width * 3 / 4
-        top: root.top - 50
-        text: "0"
+            pos: 0, 0
+            size: self.width, self.height
+            source: "assets/AgreeableDeer2.png"
