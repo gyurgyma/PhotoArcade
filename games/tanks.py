@@ -6,9 +6,6 @@ class game_object():
         self.x = x
         self.y = y
     
-    def _check_collision(self):
-        pass
-#
 class shell(game_object):
     def __init__(self, vector, **kwargs):
         super(shell, self).__init__(**kwargs)
@@ -29,6 +26,5 @@ class tank(game_object):
         pass
 
     def destroy(self):
-        if self._check_collision():
-            self._destroy()
+        pass
 
