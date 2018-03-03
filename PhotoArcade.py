@@ -1,7 +1,4 @@
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.clock import Clock
 
 from games.CannonGame import CannonGame
 

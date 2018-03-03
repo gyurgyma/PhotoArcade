@@ -2,6 +2,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.clock import Clock
 
+
 class CannonGame(BoxLayout):
     def __init__(self):
         BoxLayout.__init__(self)
@@ -17,7 +18,6 @@ class CannonGame(BoxLayout):
         self.button_stuff = Button()
         self.add_widget(self.button_stuff)
         Clock.schedule_interval(self.main_game_loop, 0.5)
-
 
     def main_game_loop(self, dt):
         self.number = self.number + 1
