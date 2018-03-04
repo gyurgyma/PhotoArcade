@@ -1,5 +1,6 @@
 import math
 
+from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
@@ -14,7 +15,6 @@ from games.Tanks import Tank
 def vector_add(vector1, vector2):
     return [((vector2[0][0] + vector1[0][0]), (vector2[0][1] + vector1[0][1])),
             ((vector2[1][0] + vector1[1][0]), (vector2[1][1] + vector1[1][1]))]
-
 
 
 
@@ -33,6 +33,16 @@ class CannonGame(FloatLayout):
         self.image_processor.find_contours()
         self.tanks = []
         self.spawn_tanks(2)
+
+        # set size
+        image_x = len(self.image_processor.terrain)
+        image_y = len(self.image_processor.terrain[1])
+        # #self.size_hint_x = image_x
+        # #self.size_hint_y = image_y
+        # self.size_hint_max_x= image_x
+        # self.size_hint_max_y= image_y
+        # self.size_hint_min_x = image_x
+        # self.size_hint_min_y = image_y
 
     def spawn_tanks(self, num_players):
         terrain = self.image_processor.terrain
@@ -117,6 +127,22 @@ class CannonGame(FloatLayout):
     def kv_to_img_coord(self, pos_x, pos_y):
         terrain_max_height = len(self.image_processor.terrain)
         return pos_x, terrain_max_height - pos_y
+
+    def img_to_kv_coord(self, pos_x, pos_y):
+        terrain_max_height = len(self.image_processor.terrain)
+        terrain_max_width = len(self.image_processor.terrain[0])
+        win_width = self.size.x
+        win_height = self.size.y
+
+        width_ratio = win_width / terrain_max_width
+        height_ratio = win_height / terrain_max_height
+
+        final_width = width_ratio * pos_x
+        final_height = height_ratio * (terrain_max_height - pos_y)
+        return final_width, final_height
+
+
+
 
     def update(self):
         self.tanks[0].name = "tk0"
