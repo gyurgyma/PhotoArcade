@@ -36,16 +36,16 @@ class CannonGame(BoxLayout):
 
         tank_position = 0
         for ii in range(num_players):
-            self.tanks.append(Tank(x=int(tank_position), y=terrain_max_height))
-            tank_position += space
+            self.tanks.append(Tank(x=tank_position, y=terrain_max_height))
+            tank_position += int(space)
 
     def on_touch_down(self, touch):
         if self.is_waiting:
-            self.vector[0] = (touch.x, touch.y)
+            self.vector[0] = (int(touch.x), int(touch.y))
 
     def on_touch_up(self, touch):
         if self.is_waiting:
-            self.vector[1] = (touch.x, touch.y)
+            self.vector[1] = (int(touch.x), int(touch.y))
             self.tanks[0].shoot(self.vector)
             self.is_waiting = False
 
@@ -61,7 +61,7 @@ class CannonGame(BoxLayout):
             if(tank.shell.x < 0 or tank.shell.x > len(terrain[0])) or (tank.shell.y < 0 or tank.shell.y > len(terrain)):
                 tank.reset_shell()
                 self.is_waiting = True
-            elif terrain[int(tank.shell.x)][int(tank.shell.y)] and tank.shell.is_in_flight:
+            elif terrain[tank.shell.x][tank.shell.y] and tank.shell.is_in_flight:
                 self.image_processor.chomp((tank.shell.x, tank.shell.y), 50)
                 tank.reset_shell()
                 self.is_waiting = True
@@ -112,7 +112,7 @@ class CannonGame(BoxLayout):
 
         # redraw the image
         with self.canvas.before:
-            Rectangle(source='img_proc/frhs.jpg', pos=self.pos, size=self.size)
+            Rectangle(source='terrain.png', pos=self.pos, size=self.size)
 
         # redraw the tanks
         with self.canvas:

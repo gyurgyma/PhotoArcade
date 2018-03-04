@@ -13,6 +13,7 @@ class ImageProcessor:
         self.contour_color = (134, 0, 100)
         self.find_contours()
         self.generate_terrain()
+        self.display_terrain()
 
     def display_image(self, img):
         cv2.imshow("image", img)
