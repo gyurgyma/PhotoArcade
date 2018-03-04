@@ -10,33 +10,27 @@ class CannonGame(BoxLayout):
     def __init__(self):
         BoxLayout.__init__(self)
 
-        button = Button()
-        self.number = 0
-
-        self.canvas = Canvas()
-        button.text = str(self.number)
-        button.size_hint_max_x = 1000
-        button.size_hint_max_y = 1000
-
-        self.add_widget(self.canvas)
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
         self.terrain = None
         self.collidables = []
 
-        self.number_tanks = 2
-        self.tanks = [Tank(x=0, y=0, team=0), Tank(x=0, y=0, team=1)]
+        self.tanks = [Tank(x=0, y=0, team=0), Tank(x=200, y=200, team=1)]
 
     def collision(self):
         pass
-
 
     def main_game_loop(self, dt):
 
         self.canvas.clear()
 
+        self.tanks[0].x += 1
+        self.tanks[0].y += 1
+
         with self.canvas:
             Color(0.5, 0.5, 0.5, 0.5)
+            for tank in self.tanks:
+                Ellipse(pos=(tank.x, tank.y), size=(100, 100))
 
 
         self.collision()
