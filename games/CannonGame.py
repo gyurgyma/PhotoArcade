@@ -22,7 +22,6 @@ class CannonGame(BoxLayout):
         self.image_processor = ImageProcessor("img_proc/frhs.jpg")
         self.image_processor.find_contours()
 
-
     def on_touch_down(self, touch):
         if self.is_waiting:
             self.vector[0] = (touch.x, touch.y)
@@ -50,7 +49,6 @@ class CannonGame(BoxLayout):
             pass
 
         else:
-
             # move tanks
             self.tanks[0].x += 1
             self.tanks[0].y += 1
@@ -64,17 +62,13 @@ class CannonGame(BoxLayout):
             self.collision(terrain)
 
             # calculate victory
-            alive_tanks = []
-            for tank in self.tanks:
-                if tank.is_alive:
-                    alive_tanks.append(tank)
-
-            if len(alive_tanks) == 1:
-                self.victory(alive_tanks[0])
-            elif len(alive_tanks) == 0:
-                self.victory()
+            self.check_victory()
 
         # draw
+        self.redraw()
+
+
+    def redraw(self):
         self.canvas.clear()
         with self.canvas.before:
             Rectangle(source='assets/AgreeableDeer2.png', pos=self.pos, size=self.size)
@@ -82,6 +76,17 @@ class CannonGame(BoxLayout):
             Color(0.5, 0.5, 0.5, 0.5)
             for tank in self.tanks:
                 Ellipse(pos=(tank.x, tank.y), size=(tank.radius, tank.radius))
+
+    def check_victory(self):
+        alive_tanks = []
+        for tank in self.tanks:
+            if tank.is_alive:
+                alive_tanks.append(tank)
+
+        if len(alive_tanks) == 1:
+            self.victory(alive_tanks[0])
+        elif len(alive_tanks) == 0:
+            self.victory()
 
     def victory(self, best_tank=None):
         pass
