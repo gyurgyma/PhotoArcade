@@ -37,8 +37,9 @@ class Tank(GameObject):
         self.shell.vector = [(0, 0), (0, 0)]
         self.shell.x = self.x
         self.shell.y = self.y
+        self.shell.is_in_flight = False
 
-def _destroy(self):
+    def _destroy(self):
         pass
 
     def destroy(self):

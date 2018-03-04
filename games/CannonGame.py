@@ -37,7 +37,7 @@ class CannonGame(BoxLayout):
                 if tank is not other:
                     if math.hypot(tank.shell.x - other.x, tank.shell.y - other.y) < other.radius:
                         tank.destroy()
-                        tank.shell.is_in_flight = False
+                        tank.reset_shell()
 
 
     def collision(self, terrain):
@@ -49,11 +49,15 @@ class CannonGame(BoxLayout):
         for tank in self.tanks:
             # len(terrain[0]) is len(row) thus how wide the picture is
             # len(terrain) is len(col) thus how high the picture is
-            if(self.x < 0 or self.x > len(terrain[0])) or (self.y < 0 or self.y > len(terrain)):
+            if(tank.shell.x < 0 or tank.shell.x > len(terrain[0])) or (tank.shell.y < 0 or tank.shell.y > len(terrain)):
                 tank.reset_shell()
-                return True
-            elif terrain[self.x][terrain[self.y]:
-                
+                self.is_waiting = True
+            elif terrain[tank.shell.x][tank.shell.y]:
+                self.image_processor.chomp((tank.shell.x, tank.shell.y), 10.0)
+                tank.reset_shell()
+                self.is_waiting = True
+
+
 
     def main_game_loop(self, dt):
 
