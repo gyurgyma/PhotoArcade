@@ -1,3 +1,5 @@
+import math
+
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import *
 from kivy.clock import Clock
@@ -29,6 +31,15 @@ class CannonGame(BoxLayout):
         if self.is_waiting:
             self.vector[1] = (touch.x, touch.y)
             self.is_waiting = False
+
+    def calculate_tank_hits(self):
+        for tank in self.tanks:
+            for other in self.tanks:
+                if tank is not other:
+                    if math.hypot(tank.shell.x - other.x, tank.shell.y - other.y) < other.radius:
+                        tank.destroy()
+                        tank.shell.is_in_flight = False
+
 
     def collision(self, terrain):
         pass
@@ -70,7 +81,7 @@ class CannonGame(BoxLayout):
         with self.canvas:
             Color(0.5, 0.5, 0.5, 0.5)
             for tank in self.tanks:
-                Ellipse(pos=(tank.x, tank.y), size=(100, 100))
+                Ellipse(pos=(tank.x, tank.y), size=(tank.radius, tank.radius))
 
     def victory(self, best_tank=None):
         pass
