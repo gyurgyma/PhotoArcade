@@ -147,20 +147,14 @@ class CannonGame(FloatLayout):
         final_height = height_ratio * (terrain_max_height - pos_y)
         return final_width, final_height
 
-
-
-
     def update(self):
-        self.tanks[0].name = "tk0"
-        self.tanks[1].name = "tk1"
+
         for tank in self.tanks:
             if tank.shell.is_in_flight:
                 # keep flying along the vector
                 tank.shell.x += int(tank.shell.vector[1][0] - tank.shell.vector[0][0])
                 tank.shell.y += int(tank.shell.vector[1][1] - tank.shell.vector[0][1])
                 tank.shell.vector = vector_add(tank.shell.vector, self.gravity_vector)
-                print(tank.name + " (" + str(tank.shell.vector[0][0]) + "," + str(tank.shell.vector[0][1]) + "), (" + str(tank.shell.vector[1][0]) + "," + str(tank.shell.vector[1][1]) + ")")
-
 
     def redraw(self):
         self.canvas.clear()
