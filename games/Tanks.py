@@ -28,8 +28,10 @@ class Tank(GameObject):
     def _move(self):
         pass
 
-    def _shoot(self):
-        pass
+    def shoot(self, vector):
+        self.shell.x = self.x
+        self.shell.y = self.y
+        self.shell.shoot(vector)
         # create shell object
 
     def _destroy(self):
