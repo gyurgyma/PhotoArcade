@@ -27,7 +27,10 @@ class ImageProcessor:
         # self.display_image(thresh)
 
         im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(self.image_original, contours, -1, self.contour_color, -2)
+        cv2.drawContours(self.image_original, contours, -1, self.contour_color, 2)
+        # for contour in range(len(contours)):
+        #     if len(contours[contour]) > 20:
+        #         cv2.drawContours(self.image_original, contours, contour, self.contour_color, -2)
         # self.display_image(self.image_original)
         # print(self.image_original)
 
@@ -63,7 +66,7 @@ class ImageProcessor:
             return True
 
     def chomp(self, center, radius: float):
-        print(center)
+        # print(center)
         """Remove a circular section"""
         x, y = center
         radius = int(radius)
@@ -73,7 +76,7 @@ class ImageProcessor:
                 if dist > radius:
                     continue
                 if self.valid_terrain_access(row, col):
-                    print(row, col)
+                    # print(row, col)
                     if self.terrain[row][col] == 1:
                         self.terrain[row][col] = 0
 
@@ -90,4 +93,4 @@ class ImageProcessor:
                 else:
                     test_matrix[row][col] = [255, 255, 255]
 
-        self.display_image(test_matrix)
+        cv2.imwrite("terrain.png", test_matrix)
