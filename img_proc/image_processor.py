@@ -54,34 +54,40 @@ class ImageProcessor:
     def terrain(self, new_terrain):
         self._terrain = new_terrain
 
+    def valid_terrain_access(self, row, col):
+        if row <= 0 or col <= 0:
+            return False
+        elif row >= len(self.terrain) or col >= len(self.terrain[0]):
+            return False
+        else:
+            return True
+
     def chomp(self, center, radius: float):
+        print(center)
         """Remove a circular section"""
         x, y = center
-        radius = numpy.floor(radius)
-        terrain_cp = self.terrain
+        radius = int(radius)
         for row in range((y - radius), (y + radius)):
             for col in range((x - radius), (x + radius)):
                 dist = numpy.sqrt(((col - x)**2) + ((row - y)**2))
                 if dist > radius:
                     continue
-                if terrain_cp[row][col] == 1:
-                    terrain_cp[row][col] = 0
-        
-        self.terrain = terrain_cp
+                if self.valid_terrain_access(row, col):
+                    print(row, col)
+                    if self.terrain[row][col] == 1:
+                        self.terrain[row][col] = 0
 
     def display_terrain(self):
-        # This should convert the terrain to an image (for debugging purposes).  It doesn't work yet
+        # This should convert the terrain to an image (for debugging purposes).
         rows = len(self._terrain)
         cols = len(self._terrain[0])
-        test_array = [[0] * cols for i in range(rows)]
-        for i in range(rows):
-            test_array[i] = [(1, 0, 1)] * cols
-
+        test_matrix = numpy.array(self.image_original)
         for row in range(rows):
             for col in range(cols):
                 #print(self._terrain[row][col])
                 if self._terrain[row][col] is 1:
-                    test_array[row][col] = (0, 0, 0)
+                    test_matrix[row][col] = [0, 0, 0]
                 else:
-                    test_array[row][col] = (255, 255, 255)
-        #self.display_image(numpy.array(test_array))
+                    test_matrix[row][col] = [255, 255, 255]
+
+        self.display_image(test_matrix)
