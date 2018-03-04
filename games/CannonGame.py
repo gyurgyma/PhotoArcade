@@ -1,5 +1,6 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.graphics import *
 from kivy.clock import Clock
 
 
@@ -10,13 +11,12 @@ class CannonGame(BoxLayout):
         button = Button()
         self.number = 0
 
+        self.canvas = Canvas()
         button.text = str(self.number)
         button.size_hint_max_x = 1000
         button.size_hint_max_y = 1000
 
-        self.add_widget(button)
-        self.button_stuff = Button()
-        self.add_widget(self.button_stuff)
+        self.add_widget(self.canvas)
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
         self.terrain = None
@@ -27,7 +27,10 @@ class CannonGame(BoxLayout):
 
     def main_game_loop(self, dt):
 
-        self.number = self.number + 1
-        self.button_stuff.text = str(self.number)
+        self.canvas.clear()
+
+        with self.canvas:
+            Color(0.5, 0.5, 0.5, 0.5)
+
 
         self.collision()
