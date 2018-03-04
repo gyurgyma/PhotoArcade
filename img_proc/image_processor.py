@@ -1,14 +1,18 @@
 import cv2
 import numpy
+import os
 
 
 class ImageProcessor:
 
     def __init__(self, filepath):
         self._terrain = None
+        self.terrain_display_count = 0
+        self.im_name = ""
+
         self.image_original = cv2.imread(filepath)
-        self._alpha = self.generate_alpha_image(self.image_original)
-        # self.display_image(self.image_original)
+        self.backup_images = numpy.array(self.image_original, copy=True)
+        self._alpha = numpy.array(self.generate_alpha_image(self.image_original))
         self.work_image = cv2.cvtColor(self.image_original, cv2.COLOR_RGB2GRAY)
         self.contour_color = (134, 0, 100)
         self.find_contours()
@@ -24,9 +28,10 @@ class ImageProcessor:
             ret, thresh = cv2.threshold(self.work_image, 150, 255, 0)
         else:
             ret, thresh = cv2.threshold(img, 150, 255, 0)
+        median = cv2.medianBlur(thresh, 9)
         # self.display_image(thresh)
 
-        im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        im2, contours, hierarchy = cv2.findContours(median, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(self.image_original, contours, -1, self.contour_color, -2)
         # self.display_image(self.image_original)
         # print(self.image_original)
@@ -38,24 +43,30 @@ class ImageProcessor:
         self._terrain = [[0] * cols for i in range(rows)]
         for i in range(rows):
             self._terrain[i] = [0] * cols
-        self.display_image(self.image_original)
+        if self._alpha is None:
+            self.generate_alpha_image(self.backup_images)
         for row in range(rows):
             for col in range(cols):
                 (r, g, b) = self.image_original[row, col]
                 if (r, g, b) == self.contour_color:
                     self._terrain[row][col] = 0
-                    self._alpha[row][col][3] = 255
+                    self._alpha[row][col] = 180
                 else:
                     self._terrain[row][col] = 1
-                    self._alpha[row][col][3] = 0
+                    self._alpha[row][col][3] = 255
 
     def generate_alpha_image(self, img):
         """generates alpha image from rgb"""
-        b, g, r = cv2.split(img)
-        alpha_channel = numpy.zeros(b.shape, dtype=b.dtype)
-        alpha_channel = alpha_channel.astype(numpy.uint8)
-        return cv2.merge((b, g, r, alpha_channel))
-        #return numpy.array((b, g, r, alpha_channel))
+        rows = len(self.image_original)
+        cols = len(self.image_original[0])
+        self._alpha = [[0] * cols for i in range(rows)]
+        for i in range(rows):
+            self._alpha[i] = [(0, 0, 0, 200)] * cols
+        (b, g, r) = cv2.split(img)
+        for row in range(rows):
+            for col in range(cols):
+                self._alpha[row][col] = (b[row][col], g[row][col], r[row][col], 255)
+        return self._alpha
 
     @property
     def terrain(self):
@@ -74,23 +85,29 @@ class ImageProcessor:
             return True
 
     def chomp(self, center, radius: float):
-        print(center)
         """Remove a circular section"""
-        x, y = center
+        x, y = (int(center[0]), int(center[1]))
         radius = int(radius)
+        len(self._terrain)
+        if self._alpha is None or self._terrain is None:
+            self.generate_terrain()
         for row in range((y - radius), (y + radius)):
             for col in range((x - radius), (x + radius)):
-                if (x < 0) or (x >= len(terrain[row])):
-                    continue
-                if (y < 0) or (y >= len(terrain)):
-                    continue
                 dist = numpy.sqrt(((col - x)**2) + ((row - y)**2))
                 if dist > radius:
                     continue
-                if self.valid_terrain_access(row, col):
-                    print(row, col)
-                    if self.terrain[row][col] == 1:
-                        self.terrain[row][col] = 0
+                if not self.valid_terrain_access(row, col):
+                    continue
+                if self._terrain[row][col] == 1:
+                    self._terrain[row][col] = 0
+                    self._alpha[row][col][3] = 200
+
+        if self.terrain_display_count > 0:
+            os.remove(self.im_name)
+
+        self.im_name = "terrain1" + str(self.terrain_display_count) + ".png"
+        self.terrain_display_count += 1
+        cv2.imwrite(self.im_name, self._alpha)
 
     def display_terrain(self):
         # This should convert the terrain to an image (for debugging purposes).
@@ -104,8 +121,3 @@ class ImageProcessor:
                     test_matrix[row][col] = [0, 0, 0]
                 else:
                     test_matrix[row][col] = [255, 255, 255]
-
-        self.display_image(test_matrix)
-
-    def display_alpha(self):
-        self.display_image(self._alpha)
