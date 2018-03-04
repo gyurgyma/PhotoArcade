@@ -25,6 +25,7 @@ class CannonGame(FloatLayout):
         self.vector = [(0, 0), (0, 0)]
         self.gravity_vector = [(0, 0), (0, -1)]
         self.shot_multiplier = 0.5
+        self.player_twos_turn = False
 
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
@@ -66,7 +67,12 @@ class CannonGame(FloatLayout):
     def on_touch_up(self, touch):
         if self.is_waiting:
             self.vector[1] = (int( self.shot_multiplier * touch.x), int(self.shot_multiplier * touch.y))
-            self.tanks[0].shoot(self.vector)
+            if self.player_twos_turn:
+                self.tanks[1].shoot(self.vector)
+                self.player_twos_turn = False
+            else:
+                self.tanks[0].shoot(self.vector)
+                self.player_twos_turn = True
             self.is_waiting = False
 
     def collision(self, terrain):
@@ -87,7 +93,7 @@ class CannonGame(FloatLayout):
                 tank.reset_shell()
                 self.is_waiting = True
 
-            elif tank.shell.is_in_flight and terrain[tank_shell_im_coord[0]][tank_shell_im_coord[1]] :
+            elif tank.shell.is_in_flight and terrain[tank_shell_im_coord[1]][tank_shell_im_coord[0]] :
                 self.image_processor.chomp(tank_shell_im_coord, 50)
                 print (str(tank.shell.x) + "," + str(tank.shell.y))
                 tank.reset_shell()
@@ -177,7 +183,7 @@ class CannonGame(FloatLayout):
             for tank in self.tanks:
                 if tank.shell.is_in_flight:
                     Line(circle=(tank.shell.x, tank.shell.y, tank.radius/10))
-                    # Ellipse(pos=(tank.shell.x - tank.radius/20, tank.shell.y - tank.radius/20), size=(tank.radius/10, tank.radius/10))
+                    Ellipse(pos=(tank.shell.x - tank.radius/10, tank.shell.y - tank.radius/10), size=(tank.radius/5, tank.radius/5))
 
     def check_victory(self):
         alive_tanks = []
