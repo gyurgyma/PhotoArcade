@@ -44,10 +44,10 @@ class ImageProcessor:
                 (r, g, b) = self.image_original[row, col]
                 if (r, g, b) == self.contour_color:
                     self._terrain[row][col] = 0
-                    self._alpha[row][col][3] = 0
+                    self._alpha[row][col][3] = 255
                 else:
                     self._terrain[row][col] = 1
-                    self._alpha[row][col][3] = 200
+                    self._alpha[row][col][3] = 0
 
     def generate_alpha_image(self, img):
         """generates alpha image from rgb"""
@@ -108,4 +108,4 @@ class ImageProcessor:
         self.display_image(test_matrix)
 
     def display_alpha(self):
-        self.display_image(self.display_alpha)
+        self.display_image(self._alpha)
