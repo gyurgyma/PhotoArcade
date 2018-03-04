@@ -106,8 +106,8 @@ class CannonGame(BoxLayout):
         for tank in self.tanks:
             if tank.shell.is_in_flight:
                 # keep flying along the vector
-                tank.shell.x += (tank.shell.vector[1][0] - tank.shell.vector[0][0])
-                tank.shell.y += (tank.shell.vector[1][1] - tank.shell.vector[0][1])
+                tank.shell.x += int(tank.shell.vector[1][0] - tank.shell.vector[0][0])
+                tank.shell.y += int(tank.shell.vector[1][1] - tank.shell.vector[0][1])
                 tank.shell.vector = vector_add(tank.shell.vector, self.gravity_vector)
                 print(tank.name + " (" + str(tank.shell.vector[0][0]) + "," + str(tank.shell.vector[0][1]) + "), (" + str(tank.shell.vector[1][0]) + "," + str(tank.shell.vector[1][1]) + ")")
 
