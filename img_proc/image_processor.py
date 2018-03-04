@@ -11,7 +11,8 @@ class ImageProcessor:
         # self.display_image(self.image_original)
         self.work_image = cv2.cvtColor(self.image_original, cv2.COLOR_RGB2GRAY)
         self.contour_color = (134, 0, 100)
-        self._terrain = None
+        self.find_contours()
+        self.generate_terrain()
 
     def display_image(self, img):
         cv2.imshow("image", img)
@@ -23,15 +24,14 @@ class ImageProcessor:
             ret, thresh = cv2.threshold(self.work_image, 150, 255, 0)
         else:
             ret, thresh = cv2.threshold(img, 150, 255, 0)
-        self.display_image(thresh)
+        # self.display_image(thresh)
 
         im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(self.image_original, contours, -1, self.contour_color, -2)
-        self.display_image(self.image_original)
+        # self.display_image(self.image_original)
         # print(self.image_original)
 
-    @property
-    def terrain(self):
+    def generate_terrain(self):
         rows = len(self.image_original)
         cols = len(self.image_original[0])
         self._terrain = [[0] * cols for i in range(rows)]
@@ -46,6 +46,8 @@ class ImageProcessor:
                 else:
                     self._terrain[row][col] = 1
 
+    @property
+    def terrain(self):
         return self._terrain
 
     @terrain.setter
