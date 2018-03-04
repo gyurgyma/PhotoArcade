@@ -1,6 +1,9 @@
+import math
+
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import *
 from kivy.clock import Clock
+from img_proc.image_processor import ImageProcessor
 
 from games.Tanks import Tank
 
@@ -13,10 +16,11 @@ class CannonGame(BoxLayout):
 
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
-        self.terrain = None
-        self.collidables = []
-
-        self.tanks = [Tank(x=0, y=0, team=0), Tank(x=200, y=200, team=1)]
+        # game objects
+        self.game_objects = []
+        self.tanks = [Tank(x=0, y=0), Tank(x=200, y=200)]
+        self.image_processor = ImageProcessor("img_proc/frhs.jpg")
+        self.image_processor.find_contours()
 
     def on_touch_down(self, touch):
         if self.is_waiting:
@@ -27,40 +31,85 @@ class CannonGame(BoxLayout):
             self.vector[1] = (touch.x, touch.y)
             self.is_waiting = False
 
-    def collision(self):
+    def collision(self, terrain):
+        self.terrain_collision(terrain)
+        self.shell_tank_collision()
         pass
+
+    def terrain_collision(self, terrain):
+        for tank in self.tanks:
+            # len(terrain[0]) is len(row) thus how wide the picture is
+            # len(terrain) is len(col) thus how high the picture is
+            if(tank.shell.x < 0 or tank.shell.x > len(terrain[0])) or (tank.shell.y < 0 or tank.shell.y > len(terrain)):
+                tank.reset_shell()
+                self.is_waiting = True
+            elif terrain[tank.shell.x][tank.shell.y]:
+                self.image_processor.chomp((tank.shell.x, tank.shell.y), 10.0)
+                tank.reset_shell()
+                self.is_waiting = True
+
+            # check if the tank is sitting on the ground
+            if terrain[tank.x][tank.y - tank.radius]:
+                pass
+            else:
+                # fall "up to" 10 pixels this "tick"
+                for ii in range(10):
+                    if not terrain[tank.x][tank.y - 1]:
+                        tank.y -= 1
+                    else:
+                        break
+
+    def shell_tank_collision(self):
+        for tank in self.tanks:
+            for other in self.tanks:
+                # "is not" returns true if memory addresses are different
+                if tank is not other:
+                    if math.hypot(tank.shell.x - other.x, tank.shell.y - other.y) < other.radius:
+                        tank.destroy()
+                        tank.reset_shell()
+                        self.is_waiting = True
 
     def main_game_loop(self, dt):
         if self.is_waiting:
             pass
         else:
+            # move tanks
             self.tanks[0].x += 1
             self.tanks[0].y += 1
 
+            # set wait for input
             if self.tanks[0].x % 10 == 0:
                 self.is_waiting = True
 
-            self.collision()
+            # collision
+            terrain = self.image_processor.terrain
+            self.collision(terrain)
 
-            alive_tanks = []
-            for tank in self.tanks:
-                if tank.is_alive:
-                    alive_tanks.append(tank)
+            # calculate victory
+            self.check_victory()
 
-            if len(alive_tanks) == 1:
-                self.victory(alive_tanks[0])
-            elif len(alive_tanks) == 0:
-                self.victory()
+        # draw
+        self.redraw()
 
+    def redraw(self):
         self.canvas.clear()
-
         with self.canvas.before:
-            Rectangle(source='assets/AgreeableDeer2.png', pos=self.pos, size=self.size)
-
+            Rectangle(source='img_proc/frhs.jpg', pos=self.pos, size=self.size)
         with self.canvas:
             Color(0.5, 0.5, 0.5, 0.5)
             for tank in self.tanks:
-                Ellipse(pos=(tank.x, tank.y), size=(100, 100))
+                Ellipse(pos=(tank.x, tank.y), size=(tank.radius, tank.radius))
+
+    def check_victory(self):
+        alive_tanks = []
+        for tank in self.tanks:
+            if tank.is_alive:
+                alive_tanks.append(tank)
+
+        if len(alive_tanks) == 1:
+            self.victory(alive_tanks[0])
+        elif len(alive_tanks) == 0:
+            self.victory()
 
     def victory(self, best_tank=None):
         pass

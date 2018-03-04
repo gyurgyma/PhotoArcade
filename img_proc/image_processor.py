@@ -29,12 +29,8 @@ class ImageProcessor:
         else:
             ret, thresh = cv2.threshold(img, 150, 255, 0)
         median = cv2.medianBlur(thresh, 9)
-        # self.display_image(thresh)
-
         im2, contours, hierarchy = cv2.findContours(median, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(self.image_original, contours, -1, self.contour_color, -2)
-        # self.display_image(self.image_original)
-        # print(self.image_original)
+        cv2.drawContours(self.image_original, contours, -1, self.contour_color, -1)
 
     def generate_terrain(self):
         """Generates terrain 2d array, now with alpha generation too!"""
@@ -116,7 +112,6 @@ class ImageProcessor:
         test_matrix = numpy.array(self.image_original)
         for row in range(rows):
             for col in range(cols):
-                #print(self._terrain[row][col])
                 if self._terrain[row][col] is 1:
                     test_matrix[row][col] = [0, 0, 0]
                 else:
