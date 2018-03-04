@@ -116,14 +116,14 @@ class CannonGame(BoxLayout):
 
         # redraw the tanks
         with self.canvas:
-            Color(0.5, 0.5, 0.5, 0.5)
+            Color(100, 0.5, 0.5, 0.5)
             for tank in self.tanks:
                 Line(circle=(tank.x, tank.y, tank.radius))
                 #Ellipse(pos=(tank.x - tank.radius/2, tank.y - tank.radius/2), size=(tank.radius, tank.radius))
 
         # redraw the shells
         with self.canvas:
-            Color(0.5, 10, 0.5, 0.5)
+            Color(0.5, 100, 0.5, 0.5)
             for tank in self.tanks:
                 Line(circle=(tank.shell.x, tank.shell.y, tank.radius/10))
                 #Ellipse(pos=(tank.shell.x - tank.radius/20, tank.shell.y - tank.radius/20), size=(tank.radius/10, tank.radius/10))
