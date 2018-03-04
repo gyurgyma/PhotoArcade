@@ -1,3 +1,5 @@
+import math
+
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import *
 from kivy.clock import Clock
@@ -15,7 +17,7 @@ class CannonGame(BoxLayout):
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
         # game objects
-        self.collidables = []
+        self.game_objects = []
         self.tanks = [Tank(x=0, y=0, team=0), Tank(x=200, y=200, team=1)]
         self.image_processor = ImageProcessor("img_proc/frhs.jpg")
         self.image_processor.find_contours()
@@ -30,7 +32,19 @@ class CannonGame(BoxLayout):
             self.is_waiting = False
 
     def collision(self, terrain):
+        self.terrain_collision(terrain)
+
         pass
+
+    def terrain_collision(self, terrain):
+        for tank in self.tanks:
+            # len(terrain[0]) is len(row) thus how wide the picture is
+            # len(terrain) is len(col) thus how high the picture is
+            if(self.x < 0 or self.x > len(terrain[0])) or (self.y < 0 or self.y > len(terrain)):
+                tank.reset_shell()
+                return True
+            elif terrain[self.x][terrain[self.y]:
+                
 
     def main_game_loop(self, dt):
 
