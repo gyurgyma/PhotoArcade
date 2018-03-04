@@ -55,14 +55,14 @@ class CannonGame(FloatLayout):
         terrain_max_height = len(terrain)
         space = terrain_length / num_players
 
-        tank_position = 10
+        #tank_position = 0
 
         #for ii in range(num_players):
             # tank_kv_position = self.img_to_kv_coord(tank_position, terrain_max_height)
             # self.tanks.append(Tank(x=tank_kv_position[0], y=tank_kv_position[0]))
-        self.tanks.append(Tank(x=tank_position+10, y=terrain_max_height-10))
-        self.tanks.append(Tank(x=tank_position+100, y=terrain_max_height-10))
-        tank_position += int(space)
+        self.tanks.append(Tank(x=50, y=terrain_max_height-10))
+        self.tanks.append(Tank(x=terrain_length - 50, y=terrain_max_height-10))
+        #tank_position += int(space)
 
     def on_touch_down(self, touch):
         if self.is_waiting:
@@ -177,7 +177,7 @@ class CannonGame(FloatLayout):
         with self.canvas:
             Color(100, 0.5, 0.5, 0.5)
             for tank in self.tanks:
-                Line(circle=(tank.x, tank.y, tank.radius))
+                #Line(circle=(tank.x, tank.y, tank.radius))
                 if tank.is_alive:
                     Ellipse(pos=(tank.x - tank.radius, tank.y - tank.radius), size=(tank.radius * 2, tank.radius * 2))
 
@@ -186,7 +186,7 @@ class CannonGame(FloatLayout):
             Color(0.5, 100, 0.5, 0.5)
             for tank in self.tanks:
                 if tank.shell.is_in_flight:
-                    Line(circle=(tank.shell.x, tank.shell.y, tank.radius/10))
+                    #Line(circle=(tank.shell.x, tank.shell.y, tank.radius/10))
                     Ellipse(pos=(tank.shell.x - tank.radius/10, tank.shell.y - tank.radius/10), size=(tank.radius/5, tank.radius/5))
 
     def check_victory(self):
