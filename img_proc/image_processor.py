@@ -67,13 +67,14 @@ class ImageProcessor:
         """Remove a circular section"""
         x, y = center
         radius = int(radius)
+        print(radius)
         for row in range((y - radius), (y + radius)):
             for col in range((x - radius), (x + radius)):
                 dist = numpy.sqrt(((col - x)**2) + ((row - y)**2))
                 if dist > radius:
                     continue
                 if self.valid_terrain_access(row, col):
-                    print(row, col)
+                    #print(row, col)
                     if self.terrain[row][col] == 1:
                         self.terrain[row][col] = 0
 

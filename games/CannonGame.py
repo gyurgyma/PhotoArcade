@@ -8,11 +8,17 @@ from img_proc.image_processor import ImageProcessor
 from games.Tanks import Tank
 
 
+def vector_add(vector1, vector2):
+    return [((vector2[0][0] - vector1[0][0]), (vector2[0][1] - vector1[0][1])),
+            ((vector2[1][0] - vector1[1][0]), (vector2[1][1] - vector1[1][1]))]
+
+
 class CannonGame(BoxLayout):
     def __init__(self):
         BoxLayout.__init__(self)
-        self.is_waiting = False
+        self.is_waiting = True
         self.vector = [(0, 0), (0, 0)]
+        self.gravity_vector = [(0, 0), (0, -10)]
 
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
@@ -29,6 +35,7 @@ class CannonGame(BoxLayout):
     def on_touch_up(self, touch):
         if self.is_waiting:
             self.vector[1] = (touch.x, touch.y)
+            self.tanks[0].shoot(self.vector)
             self.is_waiting = False
 
     def collision(self, terrain):
@@ -43,17 +50,15 @@ class CannonGame(BoxLayout):
             if(tank.shell.x < 0 or tank.shell.x > len(terrain[0])) or (tank.shell.y < 0 or tank.shell.y > len(terrain)):
                 tank.reset_shell()
                 self.is_waiting = True
-            elif terrain[tank.shell.x][tank.shell.y]:
-                self.image_processor.chomp((tank.shell.x, tank.shell.y), 10.0)
+            elif terrain[int(tank.shell.x)][int(tank.shell.y)]:
+                self.image_processor.chomp((tank.shell.x, tank.shell.y), 50)
                 tank.reset_shell()
                 self.is_waiting = True
 
             # check if the tank is sitting on the ground
-            if terrain[tank.x][tank.y - tank.radius]:
-                pass
-            else:
+            if not terrain[tank.x][tank.y - tank.radius]:
                 # fall "up to" 10 pixels this "tick"
-                for ii in range(10):
+                for ii in range(self.gravity_vector[1][1] - self.gravity_vector[1][0]):
                     if not terrain[tank.x][tank.y - 1]:
                         tank.y -= 1
                     else:
@@ -70,16 +75,9 @@ class CannonGame(BoxLayout):
                         self.is_waiting = True
 
     def main_game_loop(self, dt):
-        if self.is_waiting:
-            pass
-        else:
-            # move tanks
-            self.tanks[0].x += 1
-            self.tanks[0].y += 1
-
-            # set wait for input
-            if self.tanks[0].x % 10 == 0:
-                self.is_waiting = True
+        if not self.is_waiting:
+            # move tanks and move shells
+            self.update()
 
             # collision
             terrain = self.image_processor.terrain
@@ -91,14 +89,33 @@ class CannonGame(BoxLayout):
         # draw
         self.redraw()
 
+    def update(self):
+        for tank in self.tanks:
+            # keep flying along the vector
+            tank.shell.x += tank.shell.vector[1][0] - tank.shell.vector[0][0]
+            tank.shell.y += tank.shell.vector[1][1] - tank.shell.vector[0][1]
+            tank.shell.vector = vector_add(tank.shell.vector, self.gravity_vector)
+
     def redraw(self):
         self.canvas.clear()
+
+        # redraw the image
         with self.canvas.before:
             Rectangle(source='img_proc/frhs.jpg', pos=self.pos, size=self.size)
+
+        # redraw the tanks
         with self.canvas:
             Color(0.5, 0.5, 0.5, 0.5)
             for tank in self.tanks:
-                Ellipse(pos=(tank.x, tank.y), size=(tank.radius, tank.radius))
+                Line(circle=(tank.x, tank.y, tank.radius))
+                #Ellipse(pos=(tank.x - tank.radius/2, tank.y - tank.radius/2), size=(tank.radius, tank.radius))
+
+        # redraw the shells
+        with self.canvas:
+            Color(0.5, 10, 0.5, 0.5)
+            for tank in self.tanks:
+                Line(circle=(tank.shell.x, tank.shell.y, tank.radius/10))
+                #Ellipse(pos=(tank.shell.x - tank.radius/20, tank.shell.y - tank.radius/20), size=(tank.radius/10, tank.radius/10))
 
     def check_victory(self):
         alive_tanks = []
