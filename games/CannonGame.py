@@ -111,7 +111,7 @@ class CannonGame(FloatLayout):
                 # "is not" returns true if memory addresses are different
                 if tank is not other:
                     if math.hypot(tank.shell.x - other.x, tank.shell.y - other.y) < other.radius:
-                        tank.destroy()
+                        other.destroy()
                         tank.reset_shell()
                         self.is_waiting = True
 
