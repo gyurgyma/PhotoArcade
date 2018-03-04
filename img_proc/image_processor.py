@@ -102,6 +102,7 @@ class ImageProcessor:
                 self._alpha[row][col][1] = 255
                 self._alpha[row][col][2] = 255
 
+
         self.write_alpha_image()
 
     def display_terrain(self):
