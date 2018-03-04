@@ -54,7 +54,18 @@ class ImageProcessor:
 
     def chomp(self, center, radius: float):
         """Remove a circular section"""
-        pass
+        x, y = center
+        radius = numpy.floor(radius)
+        terrain_cp = self.terrain
+        for row in range((y - radius), (y + radius)):
+            for col in range((x - radius), (x + radius)):
+                dist = numpy.sqrt(((col - x)**2) + ((row - y)**2))
+                if dist > radius:
+                    continue
+                if terrain_cp[row][col] == 1:
+                    terrain_cp[row][col] = 0
+        
+        self.terrain = terrain_cp
 
     def display_terrain(self):
         rows = len(self.work_image[0])
