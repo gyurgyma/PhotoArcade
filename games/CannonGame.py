@@ -64,20 +64,27 @@ class CannonGame(FloatLayout):
         for tank in self.tanks:
             # len(terrain[0]) is len(row) thus how wide the picture is
             # len(terrain) is len(col) thus how high the picture is
-            if(tank.shell.x < 0 or tank.shell.x > len(terrain[0])) or (tank.shell.y < 0 or tank.shell.y > len(terrain)):
+
+            tank_shell_im_coord = self.kv_to_img_coord(tank.shell.x, tank.shell.y)
+
+            if(tank_shell_im_coord[0] < 0 or tank_shell_im_coord[0] > len(terrain[0])) \
+                    or (tank_shell_im_coord[1] < 0 or tank_shell_im_coord[1] > len(terrain)):
+
                 tank.reset_shell()
                 self.is_waiting = True
-            elif tank.shell.is_in_flight and terrain[tank.shell.x][tank.shell.y] :
-                self.image_processor.chomp(self.kv_to_img_coord(tank.shell.x, tank.shell.y), 50)
+
+            elif tank.shell.is_in_flight and terrain[tank_shell_im_coord[0]][tank_shell_im_coord[1]] :
+                self.image_processor.chomp(tank_shell_im_coord, 50)
                 print (str(tank.shell.x) + "," + str(tank.shell.y))
                 tank.reset_shell()
                 self.is_waiting = True
 
             # check if the tank is sitting on the ground
-            if not terrain[tank.x][tank.y - tank.radius]:
+            tank_im_coord = self.kv_to_img_coord(tank.x, tank.y)
+            if not terrain[tank_im_coord[0]][tank_im_coord[1] - tank.radius]:
                 # fall "up to" 10 pixels this "tick"
                 for ii in range(self.gravity_vector[1][1] - self.gravity_vector[1][0]):
-                    if not terrain[tank.x][tank.y - 1]:
+                    if not terrain[tank_im_coord[0]][tank_im_coord[1] - tank.radius]:
                         tank.y -= 1
                     else:
                         break
