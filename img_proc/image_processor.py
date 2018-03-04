@@ -25,10 +25,11 @@ class ImageProcessor:
             ret, thresh = cv2.threshold(self.work_image, 150, 255, 0)
         else:
             ret, thresh = cv2.threshold(img, 150, 255, 0)
-        # self.display_image(thresh)
+        median = cv2.medianBlur(thresh, 9)
+        cv2.imshow('Median Blur', median)
 
-        im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(self.image_original, contours, -1, self.contour_color, 2)
+        im2, contours, hierarchy = cv2.findContours(median, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(self.image_original, contours, -1, self.contour_color, -1)
         # for contour in range(len(contours)):
         #     if len(contours[contour]) > 20:
         #         cv2.drawContours(self.image_original, contours, contour, self.contour_color, -2)
