@@ -69,6 +69,10 @@ class ImageProcessor:
         radius = int(radius)
         for row in range((y - radius), (y + radius)):
             for col in range((x - radius), (x + radius)):
+                if (x < 0) or (x >= len(terrain[row])):
+                    continue
+                if (y < 0) or (y >= len(terrain)):
+                    continue
                 dist = numpy.sqrt(((col - x)**2) + ((row - y)**2))
                 if dist > radius:
                     continue
