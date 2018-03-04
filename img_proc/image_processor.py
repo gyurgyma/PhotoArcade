@@ -31,5 +31,6 @@ class ImageProcessor:
     def terrain(self):
         return None
 
-    def chomp_field(self, center, radius: float):
+    def chomp(self, center, radius: float):
+        """Remove a circular section"""
         pass
