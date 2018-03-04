@@ -9,7 +9,6 @@ class ImageProcessor:
         # self.display_image(self.image_original)
         self.work_image = cv2.cvtColor(self.image_original, cv2.COLOR_RGB2GRAY)
         self.contour_color = (134, 0, 100)
-        self.find_contours()
 
     def display_image(self, img):
         cv2.imshow("image", img)
@@ -30,7 +29,38 @@ class ImageProcessor:
 
     @property
     def terrain(self):
+        # rows = len(self.work_image[0])
+        # print(rows)
+        # cols = len(self.work_image)
+        # print(cols)
+        # terrain = [(0 * cols) for row in range(rows)]
+        # print(terrain)
+        # for col in self.work_image:
+        #     for row in self.work_image[col]:
+        #         if self.work_image[col][row] is self.contour_color:
+        #             terrain[col][row] = 0
+        #         else:
+        #             terrain[col][row] = 1
+        #
         return None
+
+    @terrain.setter
+    def terrain(self, new_terrain):
+        self.terrain = new_terrain
 
     def chomp_field(self, center, radius: float):
         pass
+
+    def display_terrain(self):
+        rows = len(self.work_image[0])
+        # print(rows)
+        # cols = len(self.work_image)
+        # print(cols)
+        # terrain_test = [(0 * cols) for row in range(rows)]
+        # print(self.terrain)
+        # for col in self.terrain:
+        #     for row in self.terrain[col]:
+        #         if self.work_image[col][row] is self.contour_color:
+        #             terrain_test[col][row] = 0
+        #         else:
+        #             terrain_test[col][row] = 1
