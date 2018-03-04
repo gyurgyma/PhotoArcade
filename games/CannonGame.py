@@ -8,6 +8,8 @@ from games.Tanks import Tank
 class CannonGame(BoxLayout):
     def __init__(self):
         BoxLayout.__init__(self)
+        self.is_waiting = False
+        self.vector = [(0, 0), (0, 0)]
 
         button = Button()
         self.number = 0
@@ -27,26 +29,41 @@ class CannonGame(BoxLayout):
         self.number_tanks = 2
         self.tanks = [Tank(x=0, y=0, team=0), Tank(x=0, y=0, team=1)]
 
+    def on_touch_down(self, touch):
+        if not self.is_waiting:
+            self.vector[0] = (touch.x, touch.y)
+
+    def on_touch_up(self, touch):
+        if not self.is_waiting:
+            self.vector[1] = (touch.x, touch.y)
+            self.is_waiting == False
+
+
     def collision(self):
         pass
 
-
     def main_game_loop(self, dt):
+        if self.is_waiting:
+            pass
+        else:
 
-        self.number = self.number + 1
-        self.button_stuff.text = str(self.number)
+            self.number = self.number + 1
+            if self.number % 10 == 0:
+                self.is_waiting = True
 
-        self.collision()
+            self.button_stuff.text = str(self.number)
 
-        alive_tanks = []
-        for tank in self.tanks:
-            if tank.is_alive:
-                alive_tanks.append(tank)
+            self.collision()
 
-        if len(alive_tanks) == 1:
-            self.victory(alive_tanks[0])
-        elif len(alive_tanks) == 0:
-            self.victory()
+            alive_tanks = []
+            for tank in self.tanks:
+                if tank.is_alive:
+                    alive_tanks.append(tank)
+
+            if len(alive_tanks) == 1:
+                self.victory(alive_tanks[0])
+            elif len(alive_tanks) == 0:
+                self.victory()
 
     def victory(self, best_tank=None):
         pass
