@@ -6,8 +6,8 @@ class ImageProcessor:
 
     def __init__(self, filepath):
         self._terrain = None
-
         self.image_original = cv2.imread(filepath)
+        self._alpha = self.generate_alpha_image(self.image_original)
         # self.display_image(self.image_original)
         self.work_image = cv2.cvtColor(self.image_original, cv2.COLOR_RGB2GRAY)
         self.contour_color = (134, 0, 100)
@@ -32,6 +32,7 @@ class ImageProcessor:
         # print(self.image_original)
 
     def generate_terrain(self):
+        """Generates terrain 2d array, now with alpha generation too!"""
         rows = len(self.image_original)
         cols = len(self.image_original[0])
         self._terrain = [[0] * cols for i in range(rows)]
@@ -43,8 +44,18 @@ class ImageProcessor:
                 (r, g, b) = self.image_original[row, col]
                 if (r, g, b) == self.contour_color:
                     self._terrain[row][col] = 0
+                    self._alpha[row][col][3] = 0
                 else:
                     self._terrain[row][col] = 1
+                    self._alpha[row][col][3] = 200
+
+    def generate_alpha_image(self, img):
+        """generates alpha image from rgb"""
+        b, g, r = cv2.split(img)
+        alpha_channel = numpy.zeros(b.shape, dtype=b.dtype)
+        alpha_channel = alpha_channel.astype(numpy.uint8)
+        return cv2.merge((b, g, r, alpha_channel))
+        #return numpy.array((b, g, r, alpha_channel))
 
     @property
     def terrain(self):
@@ -95,3 +106,6 @@ class ImageProcessor:
                     test_matrix[row][col] = [255, 255, 255]
 
         self.display_image(test_matrix)
+
+    def display_alpha(self):
+        self.display_image(self.display_alpha)
