@@ -12,7 +12,7 @@ class ImageProcessor:
 
         self.image_original = cv2.imread(filepath)
         self.backup_images = numpy.array(self.image_original, copy=True)
-        self._alpha = numpy.array(self.generate_alpha_image(self.image_original))
+        self.generate_alpha_image(self.image_original)
         self.work_image = cv2.cvtColor(self.image_original, cv2.COLOR_RGB2GRAY)
         self.contour_color = (134, 0, 100)
         self.find_contours()
@@ -63,7 +63,9 @@ class ImageProcessor:
         for row in range(rows):
             for col in range(cols):
                 self._alpha[row][col] = (b[row][col], g[row][col], r[row][col], 255)
-        return self._alpha
+
+        self._alpha = numpy.array(self._alpha)
+        self.write_alpha_image()
 
     @property
     def terrain(self):
@@ -95,18 +97,12 @@ class ImageProcessor:
                     continue
                 if not self.valid_terrain_access(row, col):
                     continue
-                if self._terrain[row][col] == 1:
-                    self._terrain[row][col] = 0
-                    self._alpha[row][col][0] = 255
-                    self._alpha[row][col][1] = 255
-                    self._alpha[row][col][2] = 255
+                self._terrain[row][col] = 0
+                self._alpha[row][col][0] = 255
+                self._alpha[row][col][1] = 255
+                self._alpha[row][col][2] = 255
 
-        if self.terrain_display_count > 0:
-            os.remove(self.im_name)
-
-        self.im_name = "terrain" + str(self.terrain_display_count) + ".png"
-        self.terrain_display_count += 1
-        cv2.imwrite(self.im_name, self._alpha)
+        self.write_alpha_image()
 
     def display_terrain(self):
         # This should convert the terrain to an image (for debugging purposes).
@@ -119,3 +115,11 @@ class ImageProcessor:
                     test_matrix[row][col] = [0, 0, 0]
                 else:
                     test_matrix[row][col] = [255, 255, 255]
+
+    def write_alpha_image(self):
+        if self.terrain_display_count > 0:
+            os.remove(self.im_name)
+
+        self.im_name = "terrain" + str(self.terrain_display_count) + ".png"
+        self.terrain_display_count += 1
+        cv2.imwrite(self.im_name, self._alpha)
