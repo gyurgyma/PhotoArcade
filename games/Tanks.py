@@ -1,15 +1,14 @@
 
 
 class GameObject():
-    def __init__(self, x, y, team):
-        self.team = team
+    def __init__(self, x, y):
         self.x = x
         self.y = y
 
 
 class Shell(GameObject):
     def __init__(self, **kwargs):
-        super(Shell, self).__init__(**kwargs)
+        super(Shell, self).__init__(0, 0)
         self.vector = [(0, 0), (0, 0)]
         self.is_in_flight = False
 

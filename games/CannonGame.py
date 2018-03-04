@@ -18,7 +18,7 @@ class CannonGame(BoxLayout):
 
         # game objects
         self.game_objects = []
-        self.tanks = [Tank(x=0, y=0, team=0), Tank(x=200, y=200, team=1)]
+        self.tanks = [Tank(x=0, y=0), Tank(x=200, y=200)]
         self.image_processor = ImageProcessor("img_proc/frhs.jpg")
         self.image_processor.find_contours()
 
@@ -31,18 +31,9 @@ class CannonGame(BoxLayout):
             self.vector[1] = (touch.x, touch.y)
             self.is_waiting = False
 
-    def calculate_tank_hits(self):
-        for tank in self.tanks:
-            for other in self.tanks:
-                if tank is not other:
-                    if math.hypot(tank.shell.x - other.x, tank.shell.y - other.y) < other.radius:
-                        tank.destroy()
-                        tank.reset_shell()
-
-
     def collision(self, terrain):
         self.terrain_collision(terrain)
-
+        self.shell_tank_collision()
         pass
 
     def terrain_collision(self, terrain):
@@ -57,13 +48,30 @@ class CannonGame(BoxLayout):
                 tank.reset_shell()
                 self.is_waiting = True
 
+            # check if the tank is sitting on the ground
+            if terrain[tank.x][tank.y - tank.radius]:
+                pass
+            else:
+                # fall "up to" 10 pixels this "tick"
+                for ii in range(10):
+                    if not terrain[tank.x][tank.y - 1]:
+                        tank.y -= 1
+                    else:
+                        break
 
+    def shell_tank_collision(self):
+        for tank in self.tanks:
+            for other in self.tanks:
+                # "is not" returns true if memory addresses are different
+                if tank is not other:
+                    if math.hypot(tank.shell.x - other.x, tank.shell.y - other.y) < other.radius:
+                        tank.destroy()
+                        tank.reset_shell()
+                        self.is_waiting = True
 
     def main_game_loop(self, dt):
-
         if self.is_waiting:
             pass
-
         else:
             # move tanks
             self.tanks[0].x += 1
@@ -82,7 +90,6 @@ class CannonGame(BoxLayout):
 
         # draw
         self.redraw()
-
 
     def redraw(self):
         self.canvas.clear()
