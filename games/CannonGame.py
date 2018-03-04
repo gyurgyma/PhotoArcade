@@ -23,10 +23,21 @@ class CannonGame(BoxLayout):
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
         # game objects
-        self.game_objects = []
-        self.tanks = [Tank(x=0, y=0), Tank(x=200, y=200)]
         self.image_processor = ImageProcessor("img_proc/frhs.jpg")
         self.image_processor.find_contours()
+        self.tanks = []
+        self.spawn_tanks(2)
+
+    def spawn_tanks(self, num_players):
+        terrain = self.image_processor.terrain
+        terrain_length = len(terrain[0])
+        terrain_max_height = len(terrain)
+        space = terrain_length / num_players
+
+        tank_position = 0
+        for ii in range(num_players):
+            self.tanks.append(Tank(x=int(tank_position), y=terrain_max_height))
+            tank_position += space
 
     def on_touch_down(self, touch):
         if self.is_waiting:
@@ -50,7 +61,7 @@ class CannonGame(BoxLayout):
             if(tank.shell.x < 0 or tank.shell.x > len(terrain[0])) or (tank.shell.y < 0 or tank.shell.y > len(terrain)):
                 tank.reset_shell()
                 self.is_waiting = True
-            elif terrain[int(tank.shell.x)][int(tank.shell.y)]:
+            elif terrain[int(tank.shell.x)][int(tank.shell.y)] and tank.shell.is_in_flight:
                 self.image_processor.chomp((tank.shell.x, tank.shell.y), 50)
                 tank.reset_shell()
                 self.is_waiting = True

@@ -22,7 +22,7 @@ class Tank(GameObject):
         self.is_alive = True
         super(Tank, self).__init__(**kwargs)
         self.shell = Shell()
-        self.radius = 100
+        self.radius = 25
 
     def _move(self):
         pass
