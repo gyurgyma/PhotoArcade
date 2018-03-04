@@ -4,7 +4,7 @@ import numpy
 
 class ImageProcessor:
 
-    def __init__(self, filepath="img_proc/mrkoolaid.jpg"):
+    def __init__(self, filepath):
         self._terrain = None
 
         self.image_original = cv2.imread(filepath)
