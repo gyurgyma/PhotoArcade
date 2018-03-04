@@ -16,12 +16,15 @@ def vector_add(vector1, vector2):
             ((vector2[1][0] + vector1[1][0]), (vector2[1][1] + vector1[1][1]))]
 
 
+
+
 class CannonGame(FloatLayout):
     def __init__(self):
         FloatLayout.__init__(self)
         self.is_waiting = True
         self.vector = [(0, 0), (0, 0)]
-        self.gravity_vector = [(0, 0), (0, -10)]
+        self.gravity_vector = [(0, 0), (0, -1)]
+        self.shot_multiplier = 0.1
 
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
@@ -44,11 +47,11 @@ class CannonGame(FloatLayout):
 
     def on_touch_down(self, touch):
         if self.is_waiting:
-            self.vector[0] = (int(touch.x), int(touch.y))
+            self.vector[0] = (int(self.shot_multiplier * touch.x), int(self.shot_multiplier * touch.y))
 
     def on_touch_up(self, touch):
         if self.is_waiting:
-            self.vector[1] = (int(touch.x), int(touch.y))
+            self.vector[1] = (int( self.shot_multiplier * touch.x), int(self.shot_multiplier * touch.y))
             self.tanks[0].shoot(self.vector)
             self.is_waiting = False
 
@@ -65,7 +68,8 @@ class CannonGame(FloatLayout):
                 tank.reset_shell()
                 self.is_waiting = True
             elif tank.shell.is_in_flight and terrain[tank.shell.x][tank.shell.y] :
-                self.image_processor.chomp((tank.shell.x, tank.shell.y), 50)
+                self.image_processor.chomp(self.kv_to_img_coord(tank.shell.x, tank.shell.y), 50)
+                print (str(tank.shell.x) + "," + str(tank.shell.y))
                 tank.reset_shell()
                 self.is_waiting = True
 
@@ -102,6 +106,10 @@ class CannonGame(FloatLayout):
 
         # draw
         self.redraw()
+
+    def kv_to_img_coord(self, pos_x, pos_y):
+        terrain_max_height = len(self.image_processor.terrain)
+        return pos_x, terrain_max_height - pos_y
 
     def update(self):
         self.tanks[0].name = "tk0"
