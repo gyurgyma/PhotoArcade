@@ -25,6 +25,7 @@ class CannonGame(FloatLayout):
         self.vector = [(0, 0), (0, 0)]
         self.gravity_vector = [(0, 0), (0, -1)]
         self.shot_multiplier = 0.5
+        self.player_twos_turn = False
 
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
@@ -66,7 +67,12 @@ class CannonGame(FloatLayout):
     def on_touch_up(self, touch):
         if self.is_waiting:
             self.vector[1] = (int( self.shot_multiplier * touch.x), int(self.shot_multiplier * touch.y))
-            self.tanks[0].shoot(self.vector)
+            if self.player_twos_turn:
+                self.tanks[1].shoot(self.vector)
+                self.player_twos_turn = False
+            else:
+                self.tanks[0].shoot(self.vector)
+                self.player_twos_turn = True
             self.is_waiting = False
 
     def collision(self, terrain):
