@@ -16,9 +16,10 @@ class ImageProcessor:
         self.display_terrain()
 
     def display_image(self, img):
-        cv2.imshow("image", img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        #cv2.imshow("image", img)
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
+        pass
 
     def find_contours(self, img=None):
         if img is None:
@@ -26,7 +27,7 @@ class ImageProcessor:
         else:
             ret, thresh = cv2.threshold(img, 150, 255, 0)
         median = cv2.medianBlur(thresh, 9)
-        cv2.imshow('Median Blur', median)
+        #cv2.imshow('Median Blur', median)
 
         im2, contours, hierarchy = cv2.findContours(median, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(self.image_original, contours, -1, self.contour_color, -1)
@@ -42,7 +43,7 @@ class ImageProcessor:
         self._terrain = [[0] * cols for i in range(rows)]
         for i in range(rows):
             self._terrain[i] = [0] * cols
-        self.display_image(self.image_original)
+        #self.display_image(self.image_original)
         for row in range(rows):
             for col in range(cols):
                 (r, g, b) = self.image_original[row, col]

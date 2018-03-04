@@ -9,8 +9,8 @@ from games.Tanks import Tank
 
 
 def vector_add(vector1, vector2):
-    return [((vector2[0][0] - vector1[0][0]), (vector2[0][1] - vector1[0][1])),
-            ((vector2[1][0] - vector1[1][0]), (vector2[1][1] - vector1[1][1]))]
+    return [((vector2[0][0] + vector1[0][0]), (vector2[0][1] + vector1[0][1])),
+            ((vector2[1][0] + vector1[1][0]), (vector2[1][1] + vector1[1][1]))]
 
 
 class CannonGame(BoxLayout):
@@ -101,11 +101,16 @@ class CannonGame(BoxLayout):
         self.redraw()
 
     def update(self):
+        self.tanks[0].name = "tk0"
+        self.tanks[1].name = "tk1"
         for tank in self.tanks:
-            # keep flying along the vector
-            tank.shell.x += tank.shell.vector[1][0] - tank.shell.vector[0][0]
-            tank.shell.y += tank.shell.vector[1][1] - tank.shell.vector[0][1]
-            tank.shell.vector = vector_add(tank.shell.vector, self.gravity_vector)
+            if tank.shell.is_in_flight:
+                # keep flying along the vector
+                tank.shell.x += (tank.shell.vector[1][0] - tank.shell.vector[0][0])
+                tank.shell.y += (tank.shell.vector[1][1] - tank.shell.vector[0][1])
+                tank.shell.vector = vector_add(tank.shell.vector, self.gravity_vector)
+                print(tank.name + " (" + str(tank.shell.vector[0][0]) + "," + str(tank.shell.vector[0][1]) + "), (" + str(tank.shell.vector[1][0]) + "," + str(tank.shell.vector[1][1]) + ")")
+
 
     def redraw(self):
         self.canvas.clear()
@@ -119,14 +124,15 @@ class CannonGame(BoxLayout):
             Color(100, 0.5, 0.5, 0.5)
             for tank in self.tanks:
                 Line(circle=(tank.x, tank.y, tank.radius))
-                #Ellipse(pos=(tank.x - tank.radius/2, tank.y - tank.radius/2), size=(tank.radius, tank.radius))
+                Ellipse(pos=(tank.x - tank.radius, tank.y - tank.radius), size=(tank.radius * 2, tank.radius * 2))
 
         # redraw the shells
         with self.canvas:
             Color(0.5, 100, 0.5, 0.5)
             for tank in self.tanks:
-                Line(circle=(tank.shell.x, tank.shell.y, tank.radius/10))
-                #Ellipse(pos=(tank.shell.x - tank.radius/20, tank.shell.y - tank.radius/20), size=(tank.radius/10, tank.radius/10))
+                if tank.shell.is_in_flight:
+                    Line(circle=(tank.shell.x, tank.shell.y, tank.radius/10))
+                    # Ellipse(pos=(tank.shell.x - tank.radius/20, tank.shell.y - tank.radius/20), size=(tank.radius/10, tank.radius/10))
 
     def check_victory(self):
         alive_tanks = []
