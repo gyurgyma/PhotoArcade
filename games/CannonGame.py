@@ -19,6 +19,15 @@ class CannonGame(BoxLayout):
         self.add_widget(self.button_stuff)
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
+        self.terrain = None
+        self.collidables = []
+
+    def collision(self):
+        pass
+
     def main_game_loop(self, dt):
+
         self.number = self.number + 1
         self.button_stuff.text = str(self.number)
+
+        self.collision()
