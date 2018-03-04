@@ -97,7 +97,9 @@ class ImageProcessor:
                     continue
                 if self._terrain[row][col] == 1:
                     self._terrain[row][col] = 0
-                    self._alpha[row][col][3] = 200
+                    self._alpha[row][col][0] = 255
+                    self._alpha[row][col][1] = 255
+                    self._alpha[row][col][2] = 255
 
         if self.terrain_display_count > 0:
             os.remove(self.im_name)
