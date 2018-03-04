@@ -95,11 +95,12 @@ class CannonGame(FloatLayout):
 
             # check if the tank is sitting on the ground
             tank_im_coord = self.kv_to_img_coord(tank.x, tank.y)
-            if not terrain[tank_im_coord[0]][tank_im_coord[1] - tank.radius]:
+            if not terrain[tank_im_coord[1]][tank_im_coord[0] - tank.radius]:
                 # fall "up to" 10 pixels this "tick"
                 # for ii in range(self.gravity_vector[1][1] - self.gravity_vector[1][0]):
                 for ii in range(13):
-                    if not terrain[tank_im_coord[0]][tank_im_coord[1] - tank.radius]:
+                    tank_im_coord = self.kv_to_img_coord(tank.x, tank.y)
+                    if not terrain[tank_im_coord[1]][tank_im_coord[0] + tank.radius]:
                         tank.y -= 1
                     else:
                         break
