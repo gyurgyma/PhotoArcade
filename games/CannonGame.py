@@ -2,6 +2,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.clock import Clock
 
+from games.Tanks import Tank
+
 
 class CannonGame(BoxLayout):
     def __init__(self):
@@ -22,8 +24,12 @@ class CannonGame(BoxLayout):
         self.terrain = None
         self.collidables = []
 
+        self.number_tanks = 2
+        self.tanks = [Tank(x=0, y=0, team=0), Tank(x=0, y=0, team=1)]
+
     def collision(self):
         pass
+
 
     def main_game_loop(self, dt):
 
@@ -31,3 +37,16 @@ class CannonGame(BoxLayout):
         self.button_stuff.text = str(self.number)
 
         self.collision()
+
+        alive_tanks = []
+        for tank in self.tanks:
+            if tank.is_alive:
+                alive_tanks.append(tank)
+
+        if len(alive_tanks) == 1:
+            self.victory(alive_tanks[0])
+        elif len(alive_tanks) == 0:
+            self.victory()
+
+    def victory(self, best_tank=None):
+        pass
