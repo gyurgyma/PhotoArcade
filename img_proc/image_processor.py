@@ -83,6 +83,7 @@ class ImageProcessor:
                     # print(row, col)
                     if self.terrain[row][col] == 1:
                         self.terrain[row][col] = 0
+        self.display_terrain()
 
     def display_terrain(self):
         # This should convert the terrain to an image (for debugging purposes).

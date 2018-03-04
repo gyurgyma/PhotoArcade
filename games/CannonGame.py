@@ -1,5 +1,6 @@
 import math
 
+from kivy.cache import Cache
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import *
 from kivy.clock import Clock
@@ -18,7 +19,7 @@ class CannonGame(BoxLayout):
         BoxLayout.__init__(self)
         self.is_waiting = True
         self.vector = [(0, 0), (0, 0)]
-        self.gravity_vector = [(0, 0), (0, -10)]
+        self.gravity_vector = [(0, 0), (0, -1)]
 
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
@@ -41,12 +42,12 @@ class CannonGame(BoxLayout):
 
     def on_touch_down(self, touch):
         if self.is_waiting:
-            self.vector[0] = (int(touch.x), int(touch.y))
+            self.vector[0] = (int(0.01*touch.x), int(0.01*touch.y))
 
     def on_touch_up(self, touch):
         if self.is_waiting:
-            self.vector[1] = (int(touch.x), int(touch.y))
-            self.tanks[0].shoot(self.vector)
+            self.vector[1] = (int(0.01*touch.x), int(0.01*touch.y))
+            self.tanks[1].shoot(self.vector)
             self.is_waiting = False
 
     def collision(self, terrain):
@@ -114,6 +115,9 @@ class CannonGame(BoxLayout):
 
     def redraw(self):
         self.canvas.clear()
+        Cache._categories['kv.image']['limit'] = 0
+        Cache.remove('kv.image')
+        Cache.remove('kv.texture')
 
         # redraw the image
         with self.canvas.before:
