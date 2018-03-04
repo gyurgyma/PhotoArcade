@@ -5,6 +5,9 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
 from kivy.clock import Clock
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+from kivy.uix.label import Label
 from img_proc.image_processor import ImageProcessor
 
 import copy
@@ -20,6 +23,7 @@ def vector_add(vector1, vector2):
 
 class CannonGame(FloatLayout):
     def __init__(self):
+
         FloatLayout.__init__(self)
         self.is_waiting = True
         self.vector = [(0, 0), (0, 0)]
@@ -197,4 +201,8 @@ class CannonGame(FloatLayout):
             self.victory()
 
     def victory(self, best_tank=None):
+        # Popup(title="Game Over", content=Label(text='Hello world'),size_hint=(None, None), size=(400, 400))
+        self.victory_callback()
+
+        #self.add_widget(Label(text= 'Game Over'))
         pass
