@@ -52,6 +52,7 @@ class ImageProcessor:
                     self._terrain[row][col] = 1
                     self._alpha[row][col][3] = 255
 
+
     def generate_alpha_image(self, img):
         """generates alpha image from rgb"""
         rows = len(self.image_original)
