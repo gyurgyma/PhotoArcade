@@ -24,7 +24,7 @@ class CannonGame(FloatLayout):
         self.is_waiting = True
         self.vector = [(0, 0), (0, 0)]
         self.gravity_vector = [(0, 0), (0, -1)]
-        self.shot_multiplier = 0.1
+        self.shot_multiplier = 0.5
 
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
@@ -51,7 +51,10 @@ class CannonGame(FloatLayout):
         space = terrain_length / num_players
 
         tank_position = 10
+
         for ii in range(num_players):
+            # tank_kv_position = self.img_to_kv_coord(tank_position, terrain_max_height)
+            # self.tanks.append(Tank(x=tank_kv_position[0], y=tank_kv_position[0]))
             self.tanks.append(Tank(x=tank_position, y=terrain_max_height))
             tank_position += int(space)
 
@@ -126,13 +129,13 @@ class CannonGame(FloatLayout):
 
     def kv_to_img_coord(self, pos_x, pos_y):
         terrain_max_height = len(self.image_processor.terrain)
-        return pos_x, terrain_max_height - pos_y
+        return int(pos_x), int(terrain_max_height - pos_y)
 
     def img_to_kv_coord(self, pos_x, pos_y):
         terrain_max_height = len(self.image_processor.terrain)
         terrain_max_width = len(self.image_processor.terrain[0])
-        win_width = self.size.x
-        win_height = self.size.y
+        win_width = self.size[0]
+        win_height = self.size[1]
 
         width_ratio = win_width / terrain_max_width
         height_ratio = win_height / terrain_max_height
@@ -161,7 +164,8 @@ class CannonGame(FloatLayout):
 
         # redraw the image
         with self.canvas.before:
-            rect = Rectangle(source=self.image_processor.im_name, pos=self.pos, size=self.size)
+            rect = Rectangle(source=self.image_processor.im_name, pos=self.pos, size=(len(self.image_processor.terrain[1]),
+                             len(self.image_processor.terrain)))
         # redraw the tanks
         with self.canvas:
             Color(100, 0.5, 0.5, 0.5)
