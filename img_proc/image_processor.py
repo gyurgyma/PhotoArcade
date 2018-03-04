@@ -11,6 +11,7 @@ class ImageProcessor:
         # self.display_image(self.image_original)
         self.work_image = cv2.cvtColor(self.image_original, cv2.COLOR_RGB2GRAY)
         self.contour_color = (134, 0, 100)
+        self._terrain = None
 
     def display_image(self, img):
         cv2.imshow("image", img)
@@ -31,26 +32,25 @@ class ImageProcessor:
 
     @property
     def terrain(self):
-        # rows = len(self.work_image[0])
-        # print(rows)
-        # cols = len(self.work_image)
-        # print(cols)
-        # terrain = [(0 * cols) for row in range(rows)]
-        # print(terrain)
-        # for col in self.work_image:
-        #     for row in self.work_image[col]:
-        #         if self.work_image[col][row] is self.contour_color:
-        #             terrain[col][row] = 0
-        #         else:
-        #             terrain[col][row] = 1
-        #
+        rows = len(self.image_original)
+        cols = len(self.image_original[0])
+        self._terrain = [[0] * cols for i in range(rows)]
+        for i in range(rows):
+            self._terrain[i] = [0] * cols
+        self.display_image(self.image_original)
+        for row in range(rows):
+            for col in range(cols):
+                (r, g, b) = self.image_original[row, col]
+                if (r, g, b) == self.contour_color:
+                    self._terrain[row][col] = 0
+                else:
+                    self._terrain[row][col] = 1
+
         return self._terrain
 
     @terrain.setter
     def terrain(self, new_terrain):
         self._terrain = new_terrain
-
-
 
     def chomp(self, center, radius: float):
         """Remove a circular section"""
@@ -68,15 +68,18 @@ class ImageProcessor:
         self.terrain = terrain_cp
 
     def display_terrain(self):
-        rows = len(self.work_image[0])
-        # print(rows)
-        # cols = len(self.work_image)
-        # print(cols)
-        # terrain_test = [(0 * cols) for row in range(rows)]
-        # print(self.terrain)
-        # for col in self.terrain:
-        #     for row in self.terrain[col]:
-        #         if self.work_image[col][row] is self.contour_color:
-        #             terrain_test[col][row] = 0
-        #         else:
-        #             terrain_test[col][row] = 1
+        # This should convert the terrain to an image (for debugging purposes).  It doesn't work yet
+        rows = len(self._terrain)
+        cols = len(self._terrain[0])
+        test_array = [[0] * cols for i in range(rows)]
+        for i in range(rows):
+            test_array[i] = [(1, 0, 1)] * cols
+
+        for row in range(rows):
+            for col in range(cols):
+                #print(self._terrain[row][col])
+                if self._terrain[row][col] is 1:
+                    test_array[row][col] = (0, 0, 0)
+                else:
+                    test_array[row][col] = (255, 255, 255)
+        #self.display_image(numpy.array(test_array))
