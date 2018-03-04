@@ -29,6 +29,7 @@ class ImageProcessor:
         else:
             ret, thresh = cv2.threshold(img, 150, 255, 0)
         median = cv2.medianBlur(thresh, 9)
+
         im2, contours, hierarchy = cv2.findContours(median, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(self.image_original, contours, -1, self.contour_color, -1)
 
@@ -46,7 +47,7 @@ class ImageProcessor:
                 (r, g, b) = self.image_original[row, col]
                 if (r, g, b) == self.contour_color:
                     self._terrain[row][col] = 0
-                    self._alpha[row][col] = 180
+                    self._alpha[row][col][3] = 150
                 else:
                     self._terrain[row][col] = 1
                     self._alpha[row][col][3] = 255
@@ -101,7 +102,7 @@ class ImageProcessor:
         if self.terrain_display_count > 0:
             os.remove(self.im_name)
 
-        self.im_name = "terrain1" + str(self.terrain_display_count) + ".png"
+        self.im_name = "terrain" + str(self.terrain_display_count) + ".png"
         self.terrain_display_count += 1
         cv2.imwrite(self.im_name, self._alpha)
 

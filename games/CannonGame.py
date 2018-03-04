@@ -1,34 +1,71 @@
 import math
 
+from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
 from kivy.clock import Clock
 from img_proc.image_processor import ImageProcessor
 
+import copy
+
 from games.Tanks import Tank
 
 
-class CannonGame(BoxLayout):
+def vector_add(vector1, vector2):
+    return [((vector2[0][0] + vector1[0][0]), (vector2[0][1] + vector1[0][1])),
+            ((vector2[1][0] + vector1[1][0]), (vector2[1][1] + vector1[1][1]))]
+
+
+
+class CannonGame(FloatLayout):
     def __init__(self):
-        BoxLayout.__init__(self)
-        self.is_waiting = False
+        FloatLayout.__init__(self)
+        self.is_waiting = True
         self.vector = [(0, 0), (0, 0)]
+        self.gravity_vector = [(0, 0), (0, -1)]
+        self.shot_multiplier = 0.5
 
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
         # game objects
-        self.game_objects = []
-        self.tanks = [Tank(x=0, y=0), Tank(x=200, y=200)]
         self.image_processor = ImageProcessor("img_proc/frhs.jpg")
         self.image_processor.find_contours()
+        self.tanks = []
+        self.spawn_tanks(2)
+
+        # set size
+        image_x = len(self.image_processor.terrain)
+        image_y = len(self.image_processor.terrain[1])
+        # #self.size_hint_x = image_x
+        # #self.size_hint_y = image_y
+        # self.size_hint_max_x= image_x
+        # self.size_hint_max_y= image_y
+        # self.size_hint_min_x = image_x
+        # self.size_hint_min_y = image_y
+
+    def spawn_tanks(self, num_players):
+        terrain = self.image_processor.terrain
+        terrain_length = len(terrain[0])
+        terrain_max_height = len(terrain)
+        space = terrain_length / num_players
+
+        tank_position = 10
+
+        for ii in range(num_players):
+            # tank_kv_position = self.img_to_kv_coord(tank_position, terrain_max_height)
+            # self.tanks.append(Tank(x=tank_kv_position[0], y=tank_kv_position[0]))
+            self.tanks.append(Tank(x=tank_position, y=terrain_max_height))
+            tank_position += int(space)
 
     def on_touch_down(self, touch):
         if self.is_waiting:
-            self.vector[0] = (touch.x, touch.y)
+            self.vector[0] = (int(self.shot_multiplier * touch.x), int(self.shot_multiplier * touch.y))
 
     def on_touch_up(self, touch):
         if self.is_waiting:
-            self.vector[1] = (touch.x, touch.y)
+            self.vector[1] = (int( self.shot_multiplier * touch.x), int(self.shot_multiplier * touch.y))
+            self.tanks[0].shoot(self.vector)
             self.is_waiting = False
 
     def collision(self, terrain):
@@ -40,21 +77,27 @@ class CannonGame(BoxLayout):
         for tank in self.tanks:
             # len(terrain[0]) is len(row) thus how wide the picture is
             # len(terrain) is len(col) thus how high the picture is
-            if(tank.shell.x < 0 or tank.shell.x > len(terrain[0])) or (tank.shell.y < 0 or tank.shell.y > len(terrain)):
+
+            tank_shell_im_coord = self.kv_to_img_coord(tank.shell.x, tank.shell.y)
+
+            if(tank_shell_im_coord[0] < 0 or tank_shell_im_coord[0] > len(terrain[0])) \
+                    or (tank_shell_im_coord[1] < 0 or tank_shell_im_coord[1] > len(terrain)):
+
                 tank.reset_shell()
                 self.is_waiting = True
-            elif terrain[tank.shell.x][tank.shell.y]:
-                self.image_processor.chomp((tank.shell.x, tank.shell.y), 10.0)
+
+            elif tank.shell.is_in_flight and terrain[tank_shell_im_coord[0]][tank_shell_im_coord[1]] :
+                self.image_processor.chomp(tank_shell_im_coord, 50)
+                print (str(tank.shell.x) + "," + str(tank.shell.y))
                 tank.reset_shell()
                 self.is_waiting = True
 
             # check if the tank is sitting on the ground
-            if terrain[tank.x][tank.y - tank.radius]:
-                pass
-            else:
+            tank_im_coord = self.kv_to_img_coord(tank.x, tank.y)
+            if not terrain[tank_im_coord[0]][tank_im_coord[1] - tank.radius]:
                 # fall "up to" 10 pixels this "tick"
-                for ii in range(10):
-                    if not terrain[tank.x][tank.y - 1]:
+                for ii in range(self.gravity_vector[1][1] - self.gravity_vector[1][0]):
+                    if not terrain[tank_im_coord[0]][tank_im_coord[1] - tank.radius]:
                         tank.y -= 1
                     else:
                         break
@@ -70,16 +113,9 @@ class CannonGame(BoxLayout):
                         self.is_waiting = True
 
     def main_game_loop(self, dt):
-        if self.is_waiting:
-            pass
-        else:
-            # move tanks
-            self.tanks[0].x += 1
-            self.tanks[0].y += 1
-
-            # set wait for input
-            if self.tanks[0].x % 10 == 0:
-                self.is_waiting = True
+        if not self.is_waiting:
+            # move tanks and move shells
+            self.update()
 
             # collision
             terrain = self.image_processor.terrain
@@ -91,14 +127,59 @@ class CannonGame(BoxLayout):
         # draw
         self.redraw()
 
+    def kv_to_img_coord(self, pos_x, pos_y):
+        terrain_max_height = len(self.image_processor.terrain)
+        return int(pos_x), int(terrain_max_height - pos_y)
+
+    def img_to_kv_coord(self, pos_x, pos_y):
+        terrain_max_height = len(self.image_processor.terrain)
+        terrain_max_width = len(self.image_processor.terrain[0])
+        win_width = self.size[0]
+        win_height = self.size[1]
+
+        width_ratio = win_width / terrain_max_width
+        height_ratio = win_height / terrain_max_height
+
+        final_width = width_ratio * pos_x
+        final_height = height_ratio * (terrain_max_height - pos_y)
+        return final_width, final_height
+
+
+
+
+    def update(self):
+        self.tanks[0].name = "tk0"
+        self.tanks[1].name = "tk1"
+        for tank in self.tanks:
+            if tank.shell.is_in_flight:
+                # keep flying along the vector
+                tank.shell.x += int(tank.shell.vector[1][0] - tank.shell.vector[0][0])
+                tank.shell.y += int(tank.shell.vector[1][1] - tank.shell.vector[0][1])
+                tank.shell.vector = vector_add(tank.shell.vector, self.gravity_vector)
+                print(tank.name + " (" + str(tank.shell.vector[0][0]) + "," + str(tank.shell.vector[0][1]) + "), (" + str(tank.shell.vector[1][0]) + "," + str(tank.shell.vector[1][1]) + ")")
+
+
     def redraw(self):
         self.canvas.clear()
+
+        # redraw the image
         with self.canvas.before:
-            Rectangle(source='img_proc/frhs.jpg', pos=self.pos, size=self.size)
+            rect = Rectangle(source=self.image_processor.im_name, pos=self.pos, size=(len(self.image_processor.terrain[1]),
+                             len(self.image_processor.terrain)))
+        # redraw the tanks
         with self.canvas:
-            Color(0.5, 0.5, 0.5, 0.5)
+            Color(100, 0.5, 0.5, 0.5)
             for tank in self.tanks:
-                Ellipse(pos=(tank.x, tank.y), size=(tank.radius, tank.radius))
+                Line(circle=(tank.x, tank.y, tank.radius))
+                Ellipse(pos=(tank.x - tank.radius, tank.y - tank.radius), size=(tank.radius * 2, tank.radius * 2))
+
+        # redraw the shells
+        with self.canvas:
+            Color(0.5, 100, 0.5, 0.5)
+            for tank in self.tanks:
+                if tank.shell.is_in_flight:
+                    Line(circle=(tank.shell.x, tank.shell.y, tank.radius/10))
+                    # Ellipse(pos=(tank.shell.x - tank.radius/20, tank.shell.y - tank.radius/20), size=(tank.radius/10, tank.radius/10))
 
     def check_victory(self):
         alive_tanks = []
