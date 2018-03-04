@@ -8,9 +8,14 @@ class GameObject():
 
 
 class Shell(GameObject):
-    def __init__(self, vector, **kwargs):
+    def __init__(self, **kwargs):
         super(Shell, self).__init__(**kwargs)
+        self.vector = [(0, 0), (0, 0)]
+        self.is_in_flight = False
+
+    def shoot(self, vector):
         self.vector = vector
+        self.is_in_flight = True
 
 
 class Tank(GameObject):
@@ -18,13 +23,15 @@ class Tank(GameObject):
         self.is_alive = True
         super(Tank, self).__init__(**kwargs)
         self.shell = Shell()
+        self.radius = 100
 
     def _move(self):
         pass
 
-    def shoot(self):
-        pass
-        # create shell object
+    def shoot(self, vector):
+        self.shell.x = self.x
+        self.shell.y = self.y
+        self.shell.shoot(vector)
 
     def reset_shell(self):
         self.shell.vector = [(0, 0), (0, 0)]
