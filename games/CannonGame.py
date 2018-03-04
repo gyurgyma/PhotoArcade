@@ -53,6 +53,10 @@ class CannonGame(BoxLayout):
                 self.victory()
 
         self.canvas.clear()
+
+        with self.canvas.before:
+            Rectangle(source='assets/AgreeableDeer2.png', pos=self.pos, size=self.size)
+
         with self.canvas:
             Color(0.5, 0.5, 0.5, 0.5)
             for tank in self.tanks:
