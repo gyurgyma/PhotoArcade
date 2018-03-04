@@ -1,9 +1,12 @@
 import math
 
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
 from kivy.clock import Clock
 from img_proc.image_processor import ImageProcessor
+
+import copy
 
 from games.Tanks import Tank
 
@@ -13,9 +16,9 @@ def vector_add(vector1, vector2):
             ((vector2[1][0] + vector1[1][0]), (vector2[1][1] + vector1[1][1]))]
 
 
-class CannonGame(BoxLayout):
+class CannonGame(FloatLayout):
     def __init__(self):
-        BoxLayout.__init__(self)
+        FloatLayout.__init__(self)
         self.is_waiting = True
         self.vector = [(0, 0), (0, 0)]
         self.gravity_vector = [(0, 0), (0, -10)]
@@ -34,7 +37,7 @@ class CannonGame(BoxLayout):
         terrain_max_height = len(terrain)
         space = terrain_length / num_players
 
-        tank_position = 0
+        tank_position = 10
         for ii in range(num_players):
             self.tanks.append(Tank(x=tank_position, y=terrain_max_height))
             tank_position += int(space)
@@ -61,7 +64,7 @@ class CannonGame(BoxLayout):
             if(tank.shell.x < 0 or tank.shell.x > len(terrain[0])) or (tank.shell.y < 0 or tank.shell.y > len(terrain)):
                 tank.reset_shell()
                 self.is_waiting = True
-            elif terrain[tank.shell.x][tank.shell.y] and tank.shell.is_in_flight:
+            elif tank.shell.is_in_flight and terrain[tank.shell.x][tank.shell.y] :
                 self.image_processor.chomp((tank.shell.x, tank.shell.y), 50)
                 tank.reset_shell()
                 self.is_waiting = True
@@ -117,8 +120,7 @@ class CannonGame(BoxLayout):
 
         # redraw the image
         with self.canvas.before:
-            Rectangle(source='terrain.png', pos=self.pos, size=self.size)
-
+            rect = Rectangle(source=self.image_processor.im_name, pos=self.pos, size=self.size)
         # redraw the tanks
         with self.canvas:
             Color(100, 0.5, 0.5, 0.5)

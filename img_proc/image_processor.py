@@ -1,11 +1,14 @@
 import cv2
 import numpy
+import os
 
 
 class ImageProcessor:
 
     def __init__(self, filepath):
         self._terrain = None
+        self.terrain_display_count = 0
+        self.im_name = ""
 
         self.image_original = cv2.imread(filepath)
         # self.display_image(self.image_original)
@@ -14,6 +17,10 @@ class ImageProcessor:
         self.find_contours()
         self.generate_terrain()
         self.display_terrain()
+
+    def __del__(self):
+        if self.terrain_display_count > 0:
+            os.remove(self.im_name)
 
     def display_image(self, img):
         #cv2.imshow("image", img)
@@ -83,6 +90,7 @@ class ImageProcessor:
                     # print(row, col)
                     if self.terrain[row][col] == 1:
                         self.terrain[row][col] = 0
+        self.display_terrain()
 
     def display_terrain(self):
         # This should convert the terrain to an image (for debugging purposes).
@@ -97,4 +105,9 @@ class ImageProcessor:
                 else:
                     test_matrix[row][col] = [255, 255, 255]
 
-        cv2.imwrite("terrain.png", test_matrix)
+        if self.terrain_display_count > 0:
+            os.remove(self.im_name)
+
+        self.im_name = "terrain" + str(self.terrain_display_count) + ".png"
+        self.terrain_display_count += 1
+        cv2.imwrite(self.im_name, test_matrix)
