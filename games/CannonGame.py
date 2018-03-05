@@ -34,7 +34,7 @@ class CannonGame(FloatLayout):
         Clock.schedule_interval(self.main_game_loop, 0.5)
 
         # game objects
-        self.image_processor = ImageProcessor("img_proc/frhs.jpg")
+        self.image_processor = ImageProcessor("assets/Michael.jpg")
         self.image_processor.find_contours()
         self.tanks = []
         self.spawn_tanks(2)
